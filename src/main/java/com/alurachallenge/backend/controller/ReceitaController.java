@@ -2,45 +2,57 @@ package com.alurachallenge.backend.controller;
 
 import com.alurachallenge.backend.dto.ReceitaDto;
 import com.alurachallenge.backend.model.Receita;
-import com.alurachallenge.backend.model.repository.MovimentacaoRepository;
+import com.alurachallenge.backend.model.repository.ReceitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/receita")
 @RestController
 public class ReceitaController {
 
     @Autowired
-    private MovimentacaoRepository movimentacaoRepository;
+    private ReceitaRepository receitaRepository;
 
     @GetMapping
     public List<Receita> findAll() {
-        return movimentacaoRepository.findReceitas();
+        return receitaRepository.findAll();
     }
 
     @PostMapping
     public Receita save(@Valid @RequestBody ReceitaDto receitaDto) {
         Receita receita = receitaDto.toReceita();
+        receitaRepository.save(receita);
         return receita;
     }
 
     @GetMapping("/{id}")
     public Receita find(@PathVariable("id") Long id) {
-        //Implementar
-        return null;
+        Optional<Receita> receita = receitaRepository.findById(id);
+        if (receita.isPresent()) {
+            return receita.get();
+        } throw new IllegalArgumentException("Id inválido");
     }
 
     @PutMapping("/{id}")
-    public Receita update(@PathVariable("id") Long id, @RequestBody ReceitaDto receitaDto) {
-        //Implementar
-        return null;
+    public Receita update(@PathVariable("id") Long id, @Valid @RequestBody ReceitaDto receitaDto) {
+        Optional<Receita> receita = receitaRepository.findById(id);
+        if (receita.isPresent()) {
+            receitaDto.update(receita.get());
+            receitaRepository.save(receita.get());
+            return receita.get();
+        } throw new IllegalArgumentException("Id inválido");
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
-        //Implementar
+        Optional<Receita> receita = receitaRepository.findById(id);
+        if (receita.isPresent()) {
+            receitaRepository.deleteById(id);
+            return;
+        } throw new IllegalArgumentException("Id inválido");
     }
 }
