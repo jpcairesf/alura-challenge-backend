@@ -4,8 +4,8 @@ import com.alurachallenge.backend.dto.DespesaDto;
 import com.alurachallenge.backend.model.Despesa;
 import com.alurachallenge.backend.model.repository.DespesaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-import sun.security.krb5.internal.crypto.Des;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,12 +15,14 @@ import java.util.Optional;
 @RestController
 public class DespesaController {
 
+    private Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
+
     @Autowired
     private DespesaRepository despesaRepository;
 
-    @GetMapping
+    @GetMapping()
     public List<Despesa> findAll() {
-        return despesaRepository.findAll();
+        return despesaRepository.findAll(sort);
     }
 
     @PostMapping
@@ -56,4 +58,7 @@ public class DespesaController {
             return;
         } throw new IllegalArgumentException("Id inválido");
     }
+
+    @DeleteMapping
+    public void deleteAll() { despesaRepository.deleteAll(); }
 }

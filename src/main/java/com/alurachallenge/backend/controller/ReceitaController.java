@@ -4,9 +4,12 @@ import com.alurachallenge.backend.dto.ReceitaDto;
 import com.alurachallenge.backend.model.Receita;
 import com.alurachallenge.backend.model.repository.ReceitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +17,14 @@ import java.util.Optional;
 @RestController
 public class ReceitaController {
 
+    private Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
+
     @Autowired
     private ReceitaRepository receitaRepository;
 
     @GetMapping
     public List<Receita> findAll() {
-        return receitaRepository.findAll();
+        return receitaRepository.findAll(sort);
     }
 
     @PostMapping
@@ -55,4 +60,8 @@ public class ReceitaController {
             return;
         } throw new IllegalArgumentException("Id inválido");
     }
+
+    @DeleteMapping
+    public void deleteAll() { receitaRepository.deleteAll(); }
+
 }
