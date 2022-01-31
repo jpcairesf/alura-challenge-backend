@@ -1,17 +1,15 @@
 package com.alurachallenge.backend.dto;
 
-import com.alurachallenge.backend.model.Categoria;
-import com.alurachallenge.backend.model.Despesa;
 import com.alurachallenge.backend.model.Frequencia;
+import com.alurachallenge.backend.model.Receita;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class DespesaDto {
+public class ReceitaDtoInput {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -28,21 +26,17 @@ public class DespesaDto {
     @NotBlank
     private String data;
 
-    @NotBlank
-    private String categoria;
-
-    public void update(Despesa despesa) {
-        despesa.setData(LocalDate.parse(this.data, formatter));
-        despesa.setDescricao(this.descricao);
-        despesa.setFrequencia(Frequencia.valueOf(this.frequencia.toUpperCase()));
-        despesa.setValor(new BigDecimal(this.valor));
-        despesa.setCategoria(Categoria.valueOf(this.categoria.toUpperCase()));
+    public void update(Receita receita) {
+        receita.setData(LocalDate.parse(this.data, formatter));
+        receita.setDescricao(this.descricao);
+        receita.setFrequencia(Frequencia.valueOf(this.frequencia.toUpperCase()));
+        receita.setValor(new BigDecimal(this.valor));
     }
 
-    public Despesa toDespesa() {
-        Despesa despesa = new Despesa();
-        update(despesa);
-        return despesa;
+    public Receita toReceita() {
+        Receita receita = new Receita();
+        update(receita);
+        return receita;
     }
 
     public String getFrequencia() {
@@ -75,13 +69,5 @@ public class DespesaDto {
 
     public void setData(String data) {
         this.data = data;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
     }
 }
