@@ -1,32 +1,36 @@
-package com.alurachallenge.backend.dto.input;
+package com.alurachallenge.backend.dto.output;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.alurachallenge.backend.model.Receita;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class DespesaDtoInput {
+public class ReceitaDtoOutput {
 
-    @NotBlank
+    private Long id;
+
     private String frequencia;
 
     private String descricao;
 
-    @Positive
-    @NotNull
     private BigDecimal valor;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @NotNull
     private LocalDate data;
 
-    @NotBlank
-    private String categoria;
+    public ReceitaDtoOutput(Receita receita) {
+        this.id = receita.getId();
+        this.frequencia = receita.getFrequencia().toString();
+        this.descricao = receita.getDescricao();
+        this.valor = receita.getValor();
+        this.data = receita.getData();
+    }
 
-    public DespesaDtoInput() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFrequencia() {
@@ -59,13 +63,5 @@ public class DespesaDtoInput {
 
     public void setData(LocalDate data) {
         this.data = data;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
     }
 }

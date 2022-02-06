@@ -8,7 +8,7 @@ import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class DespesaDtoInput {
+public class ReceitaDtoInput {
 
     @NotBlank
     private String frequencia;
@@ -23,10 +23,7 @@ public class DespesaDtoInput {
     @NotNull
     private LocalDate data;
 
-    @NotBlank
-    private String categoria;
-
-    public DespesaDtoInput() {
+    public ReceitaDtoInput() {
     }
 
     public String getFrequencia() {
@@ -59,13 +56,5 @@ public class DespesaDtoInput {
 
     public void setData(LocalDate data) {
         this.data = data;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
     }
 }

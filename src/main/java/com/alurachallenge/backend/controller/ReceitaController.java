@@ -1,65 +1,55 @@
 package com.alurachallenge.backend.controller;
 
-import com.alurachallenge.backend.dto.ReceitaDto;
-import com.alurachallenge.backend.model.Receita;
-import com.alurachallenge.backend.model.repository.ReceitaRepository;
+import com.alurachallenge.backend.dto.input.ReceitaDtoInput;
+import com.alurachallenge.backend.dto.output.ReceitaDtoOutput;
+import com.alurachallenge.backend.service.ReceitaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
-@RequestMapping("/receita")
+@RequestMapping("/receitas")
 @RestController
 public class ReceitaController {
 
-    private Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
+    private ReceitaService receitaService;
 
     @Autowired
-    private ReceitaRepository receitaRepository;
-
-    @GetMapping
-    public List<Receita> findAll() {
-        return receitaRepository.findAll(sort);
+    public ReceitaController(ReceitaService receitaService) {
+        this.receitaService = receitaService;
     }
 
-    @PostMapping
-    public Receita save(@Valid @RequestBody ReceitaDto receitaDto) {
-        Receita receita = receitaDto.toReceita();
-        receitaRepository.save(receita);
-        return receita;
+    @GetMapping
+    public List<ReceitaDtoOutput> search(
+            @RequestParam(value = "descricao", required = false) String descricao) {
+        return receitaService.search(descricao);
     }
 
     @GetMapping("/{id}")
-    public Receita find(@PathVariable("id") Long id) {
-        Optional<Receita> receita = receitaRepository.findById(id);
-        if (receita.isPresent()) {
-            return receita.get();
-        } throw new IllegalArgumentException("Id inválido");
+    public ReceitaDtoOutput findById(@PathVariable("id") Long id) {
+        return receitaService.findById(id);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public List<ReceitaDtoOutput> findByData(
+            @PathVariable("ano") Integer ano,
+            @PathVariable("mes") Integer mes) {
+        return receitaService.findByData(ano, mes);
+    }
+
+    @PostMapping
+    public ReceitaDtoOutput save(@Valid @RequestBody ReceitaDtoInput input) {
+        return receitaService.save(input);
     }
 
     @PutMapping("/{id}")
-    public Receita update(@PathVariable("id") Long id, @Valid @RequestBody ReceitaDto receitaDto) {
-        Optional<Receita> receita = receitaRepository.findById(id);
-        if (receita.isPresent()) {
-            receitaDto.update(receita.get());
-            receitaRepository.save(receita.get());
-            return receita.get();
-        } throw new IllegalArgumentException("Id inválido");
+    public ReceitaDtoOutput update(@PathVariable("id") Long id, @Valid @RequestBody ReceitaDtoInput input) {
+        return receitaService.update(id, input);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
-        Optional<Receita> receita = receitaRepository.findById(id);
-        if (receita.isPresent()) {
-            receitaRepository.deleteById(id);
-            return;
-        } throw new IllegalArgumentException("Id inválido");
+        receitaService.delete(id);
     }
-
-    @DeleteMapping
-    public void deleteAll() { receitaRepository.deleteAll(); }
-
 }

@@ -1,64 +1,55 @@
 package com.alurachallenge.backend.controller;
 
-import com.alurachallenge.backend.dto.DespesaDto;
-import com.alurachallenge.backend.model.Despesa;
-import com.alurachallenge.backend.model.repository.DespesaRepository;
+import com.alurachallenge.backend.dto.input.DespesaDtoInput;
+import com.alurachallenge.backend.dto.output.DespesaDtoOutput;
+import com.alurachallenge.backend.service.DespesaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
-@RequestMapping("/despesa")
+@RequestMapping("/despesas")
 @RestController
 public class DespesaController {
 
-    private Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
+    private DespesaService despesaService;
 
-    @Autowired
-    private DespesaRepository despesaRepository;
-
-    @GetMapping()
-    public List<Despesa> findAll() {
-        return despesaRepository.findAll(sort);
+    @GetMapping
+    public List<DespesaDtoOutput> search(
+            @RequestParam(value = "descricao", required = false) String descricao) {
+        return despesaService.search(descricao);
     }
 
-    @PostMapping
-    public Despesa save(@Valid @RequestBody DespesaDto despesaDto) {
-        Despesa despesa = despesaDto.toDespesa();
-        despesaRepository.save(despesa);
-        return despesa;
+    @Autowired
+    public DespesaController(DespesaService despesaService) {
+        this.despesaService = despesaService;
     }
 
     @GetMapping("/{id}")
-    public Despesa find(@PathVariable("id") Long id) {
-        Optional<Despesa> despesa = despesaRepository.findById(id);
-        if (despesa.isPresent()) {
-            return despesa.get();
-        } throw new IllegalArgumentException("Id inválido");
+    public DespesaDtoOutput find(@PathVariable("id") Long id) {
+        return despesaService.findById(id);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public List<DespesaDtoOutput> findByData(
+            @PathVariable("ano") Integer ano,
+            @PathVariable("mes") Integer mes) {
+        return despesaService.findByData(ano, mes);
+    }
+
+    @PostMapping
+    public DespesaDtoOutput save(@Valid @RequestBody DespesaDtoInput input) {
+        return despesaService.save(input);
     }
 
     @PutMapping("/{id}")
-    public Despesa update(@PathVariable("id") Long id, @Valid @RequestBody DespesaDto despesaDto) {
-        Optional<Despesa> despesa = despesaRepository.findById(id);
-        if (despesa.isPresent()) {
-            despesaDto.update(despesa.get());
-            despesaRepository.save(despesa.get());
-            return despesa.get();
-        } throw new IllegalArgumentException("Id inválido");
+    public DespesaDtoOutput update(@PathVariable("id") Long id, @Valid @RequestBody DespesaDtoInput input) {
+        return despesaService.update(id, input);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
-        Optional<Despesa> despesa = despesaRepository.findById(id);
-        if (despesa.isPresent()) {
-            despesaRepository.deleteById(id);
-            return;
-        } throw new IllegalArgumentException("Id inválido");
+        despesaService.delete(id);
     }
-
-    @DeleteMapping
-    public void deleteAll() { despesaRepository.deleteAll(); }
 }

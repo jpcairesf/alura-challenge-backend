@@ -1,4 +1,4 @@
-package com.alurachallenge.backend.model.repository;
+package com.alurachallenge.backend.repository;
 
 import com.alurachallenge.backend.model.Movimentacao;
 import org.springframework.data.domain.Sort;
