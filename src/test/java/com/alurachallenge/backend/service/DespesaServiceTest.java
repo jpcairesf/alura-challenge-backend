@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Sort;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,11 +43,7 @@ public class DespesaServiceTest {
 
     @Test
     public void shouldSaveCorrectly() {
-        DespesaDtoInput despesa1 = new DespesaDtoInput();
-        despesa1.setData(LocalDate.of(2022, 1, 1));
-        despesa1.setValor(BigDecimal.ONE);
-        despesa1.setFrequencia("FIXA");
-        despesa1.setCategoria("MORADIA");
+        DespesaDtoInput despesa1 = newDespesaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA", "MORADIA");
 
         when(despesaRepository.save(any(Despesa.class))).thenReturn(new Despesa());
 
@@ -62,22 +59,15 @@ public class DespesaServiceTest {
 
     @Test
     public void shouldReturnAllDespesas() {
-        DespesaDtoInput despesa1 = new DespesaDtoInput();
-        despesa1.setData(LocalDate.of(2022, 1, 1));
-        despesa1.setValor(BigDecimal.ONE);
-        despesa1.setFrequencia("FIXA");
-        despesa1.setCategoria("MORADIA");
+        DespesaDtoInput despesa1 = newDespesaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA", "MORADIA");
 
         when(despesaRepository.save(any(Despesa.class))).thenReturn(new Despesa());
 
         despesaService.save(despesa1);
 
         List<Despesa> outputs = new ArrayList();
-        Despesa despesa = new Despesa();
-        despesa.setData(LocalDate.of(2022, 1, 1));
-        despesa.setValor(BigDecimal.ONE);
-        despesa.setFrequencia(Frequencia.FIXA);
-        despesa.setCategoria(Categoria.MORADIA);
+        Despesa despesa = newDespesa(new Despesa(), 1, 1, BigDecimal.ONE, "testando", "FIXA", "MORADIA");
+
         outputs.add(despesa);
 
         Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
@@ -96,19 +86,9 @@ public class DespesaServiceTest {
 
     @Test
     public void shouldNotReturnDespesasWithoutDescricao() {
-        DespesaDtoInput despesa1 = new DespesaDtoInput();
-        despesa1.setDescricao("testando");
-        despesa1.setData(LocalDate.of(2022, 1, 1));
-        despesa1.setValor(BigDecimal.ONE);
-        despesa1.setFrequencia("FIXA");
-        despesa1.setCategoria("MORADIA");
+        DespesaDtoInput despesa1 = newDespesaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA", "MORADIA");
 
-        DespesaDtoInput despesa2 = new DespesaDtoInput();
-        despesa2.setDescricao("nada");
-        despesa2.setData(LocalDate.of(2022, 1, 1));
-        despesa2.setValor(BigDecimal.ONE);
-        despesa2.setFrequencia("FIXA");
-        despesa2.setCategoria("MORADIA");
+        DespesaDtoInput despesa2 = newDespesaDtoInput(1, 1, BigDecimal.ONE, "nada", "FIXA", "MORADIA");
 
         when(despesaRepository.save(any(Despesa.class))).thenReturn(new Despesa());
 
@@ -116,12 +96,8 @@ public class DespesaServiceTest {
         despesaService.save(despesa2);
 
         List<Despesa> outputs = new ArrayList();
-        Despesa despesa = new Despesa();
-        despesa.setDescricao("testando");
-        despesa.setData(LocalDate.of(2022, 1, 1));
-        despesa.setValor(BigDecimal.ONE);
-        despesa.setFrequencia(Frequencia.FIXA);
-        despesa.setCategoria(Categoria.MORADIA);
+        Despesa despesa = newDespesa(new Despesa(), 1, 1, BigDecimal.ONE, "testando", "FIXA", "MORADIA");
+
         outputs.add(despesa);
 
         Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
@@ -135,21 +111,12 @@ public class DespesaServiceTest {
 
     @Test
     public void shouldUpdateCorrectly() {
-        DespesaDtoInput despesa1 = new DespesaDtoInput();
-        despesa1.setData(LocalDate.of(2022, 2, 2));
-        despesa1.setValor(BigDecimal.TEN);
-        despesa1.setFrequencia("EVENTUAL");
-        despesa1.setCategoria("ALIMENTACAO");
+        DespesaDtoInput despesa1 = newDespesaDtoInput(2, 2, BigDecimal.TEN, "testando", "EVENTUAL", "ALIMENTACAO");
 
         when(despesaRepository.save(any(Despesa.class))).thenReturn(new Despesa());
 
         Optional<Despesa> optionalDespesa = Optional.ofNullable(new Despesa());
-        Despesa despesa = optionalDespesa.get();
-        despesa.setId(1L);
-        despesa.setData(LocalDate.of(2022, 1, 1));
-        despesa.setValor(BigDecimal.ONE);
-        despesa.setFrequencia(Frequencia.FIXA);
-        despesa.setCategoria(Categoria.ALIMENTACAO);
+        Despesa despesa = newDespesa(optionalDespesa.get(), 1, 1, BigDecimal.ONE, "testando", "FIXA", "ALIMENTACAO");
 
         when(despesaRepository.findById(anyLong())).thenReturn(optionalDespesa);
 
@@ -164,23 +131,8 @@ public class DespesaServiceTest {
 
     @Test
     public void shouldDeleteCorrectly() {
-        DespesaDtoInput despesa1 = new DespesaDtoInput();
-        despesa1.setData(LocalDate.of(2022, 2, 2));
-        despesa1.setValor(BigDecimal.TEN);
-        despesa1.setFrequencia("EVENTUAL");
-        despesa1.setCategoria("ALIMENTACAO");
-
-        when(despesaRepository.save(any(Despesa.class))).thenReturn(new Despesa());
-
-        despesaService.save(despesa1);
-
         Optional<Despesa> optionalDespesa = Optional.ofNullable(new Despesa());
-        Despesa despesa = optionalDespesa.get();
-        despesa.setId(1L);
-        despesa.setData(LocalDate.of(2022, 1, 1));
-        despesa.setValor(BigDecimal.ONE);
-        despesa.setFrequencia(Frequencia.FIXA);
-        despesa.setCategoria(Categoria.ALIMENTACAO);
+        Despesa despesa = newDespesa(optionalDespesa.get(), 1, 1, BigDecimal.ONE, "testando", "FIXA", "ALIMENTACAO");
 
         when(despesaRepository.findById(anyLong())).thenReturn(optionalDespesa);
 
@@ -188,4 +140,28 @@ public class DespesaServiceTest {
 
         verify(despesaRepository).deleteById(despesa.getId());
     }
+
+    @NotNull
+    private DespesaDtoInput newDespesaDtoInput(int month, int day, BigDecimal valor, String descricao, String frequencia, String categoria) {
+        DespesaDtoInput input = new DespesaDtoInput();
+        input.setData(LocalDate.of(2022, month, day));
+        input.setValor(valor);
+        input.setDescricao(descricao);
+        input.setFrequencia(frequencia);
+        input.setCategoria(categoria);
+        return input;
+    }
+
+    @NotNull
+    private Despesa newDespesa(Despesa despesa, int month, int day, BigDecimal valor, String descricao, String frequencia, String categoria) {
+        despesa.setId(1L);
+        despesa.setData(LocalDate.of(2022, month, day));
+        despesa.setValor(valor);
+        despesa.setDescricao(descricao);
+        despesa.setFrequencia(Frequencia.valueOf(frequencia));
+        despesa.setCategoria(Categoria.valueOf(categoria));
+        return despesa;
+    }
+
+
 }

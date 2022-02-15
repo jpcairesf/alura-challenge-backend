@@ -5,6 +5,7 @@ import com.alurachallenge.backend.dto.output.ReceitaDtoOutput;
 import com.alurachallenge.backend.model.Frequencia;
 import com.alurachallenge.backend.model.Receita;
 import com.alurachallenge.backend.repository.ReceitaRepository;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -37,10 +39,7 @@ public class ReceitaServiceTest {
 
     @Test
     public void shouldSaveCorrectly() {
-        ReceitaDtoInput receita1 = new ReceitaDtoInput();
-        receita1.setData(LocalDate.of(2022, 1, 1));
-        receita1.setValor(BigDecimal.ONE);
-        receita1.setFrequencia("FIXA");
+        ReceitaDtoInput receita1 = newReceitaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA");
 
         when(receitaRepository.save(any(Receita.class))).thenReturn(new Receita());
 
@@ -55,20 +54,15 @@ public class ReceitaServiceTest {
 
     @Test
     public void shouldReturnAllReceitas() {
-        ReceitaDtoInput receita1 = new ReceitaDtoInput();
-        receita1.setData(LocalDate.of(2022, 1, 1));
-        receita1.setValor(BigDecimal.ONE);
-        receita1.setFrequencia("FIXA");
+        ReceitaDtoInput receita1 = newReceitaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA");
 
         when(receitaRepository.save(any(Receita.class))).thenReturn(new Receita());
 
         receitaService.save(receita1);
 
         List<Receita> outputs = new ArrayList();
-        Receita receita = new Receita();
-        receita.setData(LocalDate.of(2022, 1, 1));
-        receita.setValor(BigDecimal.ONE);
-        receita.setFrequencia(Frequencia.FIXA);
+        Receita receita = newReceita(new Receita(), 1, 1, BigDecimal.ONE, "testando", "FIXA");
+
         outputs.add(receita);
 
         Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
@@ -86,17 +80,10 @@ public class ReceitaServiceTest {
 
     @Test
     public void shouldNotReturnReceitasWithoutDescricao() {
-        ReceitaDtoInput receita1 = new ReceitaDtoInput();
-        receita1.setDescricao("testando");
-        receita1.setData(LocalDate.of(2022, 1, 1));
-        receita1.setValor(BigDecimal.ONE);
-        receita1.setFrequencia("FIXA");
+        ReceitaDtoInput receita1 = newReceitaDtoInput(1, 1, BigDecimal.ONE, "testando", "FIXA");
 
-        ReceitaDtoInput receita2 = new ReceitaDtoInput();
-        receita2.setDescricao("nada");
-        receita2.setData(LocalDate.of(2022, 1, 1));
-        receita2.setValor(BigDecimal.ONE);
-        receita2.setFrequencia("FIXA");
+        ReceitaDtoInput receita2 = newReceitaDtoInput(1, 1, BigDecimal.ONE,
+                "nada", "FIXA");
 
         when(receitaRepository.save(any(Receita.class))).thenReturn(new Receita());
 
@@ -104,11 +91,7 @@ public class ReceitaServiceTest {
         receitaService.save(receita2);
 
         List<Receita> outputs = new ArrayList();
-        Receita receita = new Receita();
-        receita.setDescricao("testando");
-        receita.setData(LocalDate.of(2022, 1, 1));
-        receita.setValor(BigDecimal.ONE);
-        receita.setFrequencia(Frequencia.FIXA);
+        Receita receita = newReceita(new Receita(), 1, 1, BigDecimal.ONE, "testando", "FIXA");
         outputs.add(receita);
 
         Sort sort = Sort.by("data").descending().and(Sort.by("valor").descending());
@@ -122,19 +105,12 @@ public class ReceitaServiceTest {
 
     @Test
     public void shouldUpdateCorrectly() {
-        ReceitaDtoInput receita1 = new ReceitaDtoInput();
-        receita1.setData(LocalDate.of(2022, 2, 2));
-        receita1.setValor(BigDecimal.TEN);
-        receita1.setFrequencia("EVENTUAL");
+        ReceitaDtoInput receita1 = newReceitaDtoInput(2, 2, BigDecimal.TEN, "testando", "EVENTUAL");
 
         when(receitaRepository.save(any(Receita.class))).thenReturn(new Receita());
 
-        java.util.Optional<Receita> optionalReceita = java.util.Optional.ofNullable(new Receita());
-        Receita receita = optionalReceita.get();
-        receita.setId(1L);
-        receita.setData(LocalDate.of(2022, 1, 1));
-        receita.setValor(BigDecimal.ONE);
-        receita.setFrequencia(Frequencia.FIXA);
+        Optional<Receita> optionalReceita = Optional.ofNullable(new Receita());
+        Receita receita = newReceita(optionalReceita.get(), 1, 1, BigDecimal.ONE, "testando", "FIXA");
 
         when(receitaRepository.findById(anyLong())).thenReturn(optionalReceita);
 
@@ -148,27 +124,34 @@ public class ReceitaServiceTest {
 
     @Test
     public void shouldDeleteCorrectly() {
-        ReceitaDtoInput receita1 = new ReceitaDtoInput();
-        receita1.setData(LocalDate.of(2022, 2, 2));
-        receita1.setValor(BigDecimal.TEN);
-        receita1.setFrequencia("EVENTUAL");
-
-        when(receitaRepository.save(any(Receita.class))).thenReturn(new Receita());
-
-        receitaService.save(receita1);
-
-        java.util.Optional<Receita> optionalReceita = java.util.Optional.ofNullable(new Receita());
-        Receita receita = optionalReceita.get();
-        receita.setId(1L);
-        receita.setData(LocalDate.of(2022, 1, 1));
-        receita.setValor(BigDecimal.ONE);
-        receita.setFrequencia(Frequencia.FIXA);
+        Optional<Receita> optionalReceita = Optional.ofNullable(new Receita());
+        Receita receita = newReceita(optionalReceita.get(), 1, 1, BigDecimal.ONE, "testando", "FIXA");
 
         when(receitaRepository.findById(anyLong())).thenReturn(optionalReceita);
 
         receitaService.delete(receita.getId());
 
         verify(receitaRepository).deleteById(receita.getId());
+    }
+
+    @NotNull
+    private ReceitaDtoInput newReceitaDtoInput(int month, int day, BigDecimal valor, String descricao, String frequencia) {
+        ReceitaDtoInput input = new ReceitaDtoInput();
+        input.setData(LocalDate.of(2022, month, day));
+        input.setValor(valor);
+        input.setDescricao(descricao);
+        input.setFrequencia(frequencia);
+        return input;
+    }
+
+    @NotNull
+    private Receita newReceita(Receita receita, int month, int day, BigDecimal valor, String descricao, String frequencia) {
+        receita.setId(1L);
+        receita.setData(LocalDate.of(2022, month, day));
+        receita.setValor(valor);
+        receita.setDescricao(descricao);
+        receita.setFrequencia(Frequencia.valueOf(frequencia));
+        return receita;
     }
 
 }
